@@ -497,7 +497,7 @@ function paintCupo(){
   $("wCupo").textContent = q===0 && estado.ok ? "Agotada" : (estado.ok ? `${q}/${C.cupo}` : `${C.cupo}`);
   $("wCupo").classList.toggle("low", estado.ok && q>0 && q<=5);
   $("wMeter").style.width = pct + "%";
-  $("wCupoTxt").textContent = estado.ok ? (q ? `Van ${estado.reservadas} reservadas de ${C.cupo}.` : "Ya no quedan. Escríbenos para la lista de espera.") : `Solo ${C.cupo} burgers en esta apertura.`;
+  $("wCupoTxt").textContent = estado.ok ? (q ? `${estado.reservadas===1 ? "Va 1 reservada" : "Van "+estado.reservadas+" reservadas"} de ${C.cupo}.` : "Ya no quedan. Escríbenos para la lista de espera.") : `Solo ${C.cupo} burgers en esta apertura.`;
   $("metaCupo").textContent = estado.ok ? (q ? `Quedan ${q} de ${C.cupo}` : "Agotada") : `Solo ${C.cupo}`;
 }
 const stateHtml = (t, p, extra) => `<div class="state"><h3>${t}</h3><p>${p}</p>${extra||""}</div>`;
