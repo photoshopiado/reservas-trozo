@@ -36,6 +36,7 @@ html.lenis,html.lenis body{height:auto}
 body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 @supports (overflow:clip){html,body{overflow-x:clip}}
 body.is-loading{overflow:hidden}
+html:has(> body.is-loading){overflow:hidden} /* html tiene overflow-x:clip, así que el hidden del body no llega al viewport */
 img{display:block;max-width:100%}
 button,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:0;touch-action:manipulation}
@@ -149,7 +150,9 @@ em{font-family:var(--serif);font-style:italic;font-weight:400}
 
 /* ---------- reserva (sección crema) ---------- */
 .reserve{position:relative;z-index:5;background:var(--fg);color:var(--ink);border-radius:clamp(22px,3vw,48px) clamp(22px,3vw,48px) 0 0;
-  padding:clamp(56px,9vw,140px) var(--pad) clamp(70px,9vw,140px)}
+  padding:clamp(56px,9vw,140px) var(--pad) clamp(70px,9vw,140px);
+  /* al saltar a #reservar el título no queda debajo de la barra fija (en teléfono el padding es menor que la barra) */
+  scroll-margin-top:max(10px,calc(92px + env(safe-area-inset-top,0px) - clamp(56px,9vw,140px)))}
 .reserve__grid{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(28px,4vw,64px);max-width:1320px;margin:0 auto}
 .reserve__head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:18px 40px}
 .reserve__title{font-size:clamp(58px,10.6vw,178px);font-weight:900;text-transform:uppercase;letter-spacing:-.07em;line-height:.82}
@@ -187,7 +190,7 @@ em{font-family:var(--serif);font-style:italic;font-weight:400}
 .stepper button:disabled{opacity:.22;cursor:default}
 .stepper output{min-width:34px;text-align:center;font-size:21px;font-weight:900}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{min-height:38px;padding:0 13px;border:1px solid rgba(10,10,10,.22);border-radius:99px;font-size:14px;font-weight:500;transition:background .25s,color .25s,border-color .25s}
+.chip{min-height:40px;padding:0 13px;border:1px solid rgba(10,10,10,.22);border-radius:99px;font-size:14px;font-weight:500;transition:background .25s,color .25s,border-color .25s}
 .chip[aria-pressed="true"]{background:var(--flama);border-color:var(--flama);color:var(--fg);font-weight:700;text-decoration:line-through;text-decoration-thickness:2px}
 .addline{align-self:flex-start;font-size:14px;font-weight:600;min-height:40px;display:inline-flex;align-items:center;text-decoration:underline;text-underline-offset:3px}
 .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -222,7 +225,7 @@ textarea.input{padding:12px 16px;min-height:84px;resize:vertical;line-height:1.4
 .bank__r span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);display:block}
 .bank__r strong{font-size:18px;font-weight:700;letter-spacing:-.01em;overflow-wrap:anywhere}
 .bank__r strong.big{font-size:28px;font-weight:900;color:var(--mostaza)}
-.copy{flex:none;min-height:38px;padding:0 14px;border-radius:99px;border:1px solid var(--line);font-size:13px;font-weight:700;transition:background .25s,color .25s}
+.copy{flex:none;min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line);font-size:13px;font-weight:700;transition:background .25s,color .25s}
 .copy:hover{background:var(--fg);color:var(--ink)}
 .copy.is-done{background:var(--flama);border-color:var(--flama);color:var(--fg)}
 .bank__all{margin-top:12px;min-height:46px;border-radius:99px;background:var(--fg);color:var(--ink);font-weight:800;font-size:14px}
@@ -230,6 +233,7 @@ textarea.input{padding:12px 16px;min-height:84px;resize:vertical;line-height:1.4
 .drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;min-height:180px;padding:20px;border:2px dashed rgba(10,10,10,.28);border-radius:18px;background:#fffdf7;cursor:pointer;transition:border-color .25s,background .25s}
 .drop:hover,.drop.is-over{border-color:var(--flama);background:#fff7ef}
 .drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.drop:has(input:focus-visible){outline:2px solid var(--ink);outline-offset:3px}
 .drop svg{width:36px;height:36px;color:var(--flama)}
 .drop b{font-size:18px;font-weight:800;letter-spacing:-.02em}
 .drop span{font-size:14px;color:var(--ink-mute)}
@@ -369,9 +373,9 @@ textarea.input{padding:12px 16px;min-height:84px;resize:vertical;line-height:1.4
 
           <section class="step" aria-labelledby="s2">
             <div class="step__h"><span class="step__n">2</span><h3 id="s2">Tus datos</h3></div>
-            <div class="field" id="fNombre"><label for="nombre">Nombre</label><input class="input" id="nombre" name="nombre" autocomplete="name" placeholder="¿A nombre de quién?"><span class="err"></span></div>
+            <div class="field" id="fNombre"><label for="nombre">Nombre</label><input class="input" id="nombre" name="nombre" autocomplete="name" maxlength="60" placeholder="¿A nombre de quién?"><span class="err"></span></div>
             <div class="field" id="fWa"><label for="whatsapp">WhatsApp</label><input class="input num" id="whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="099 123 4567"><span class="err"></span></div>
-            <div class="field"><label for="nota">Nota <span style="text-transform:none;letter-spacing:0;font-weight:500">(opcional)</span></label><textarea class="input" id="nota" name="nota" rows="2" placeholder="Algo que debamos saber"></textarea></div>
+            <div class="field"><label for="nota">Nota <span style="text-transform:none;letter-spacing:0;font-weight:500">(opcional)</span></label><textarea class="input" id="nota" name="nota" rows="2" maxlength="300" placeholder="Algo que debamos saber"></textarea></div>
             <p class="hint">No tenemos local: <b>retiras tú o mandas tu delivery</b>. La hora y el punto los coordinamos por WhatsApp.</p>
           </section>
 
@@ -436,11 +440,14 @@ const F = {lines:[{q:1, sin:[]}], colas:0, pago:"completo", proof:null};
 const ready = fetch("apertura.json?v=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => { C = j; return j; });
 async function refreshCupo(){
   if(!C.endpoint){ estado = {reservadas:0, ok:false, demo:true}; paintCupo(); return; }
+  // con tope de tiempo: si Google tarda o no responde, el formulario igual aparece (el cupo se valida al enviar)
+  const ac = window.AbortController ? new AbortController() : null, to = setTimeout(() => { if(ac) ac.abort(); }, 8000);
   try{
-    const r = await fetch(C.endpoint + "?accion=estado&apertura=" + encodeURIComponent(C.id), {cache:"no-store"});
+    const r = await fetch(C.endpoint + "?accion=estado&apertura=" + encodeURIComponent(C.id), {cache:"no-store", signal:ac ? ac.signal : undefined});
     const j = await r.json();
     if(j && j.ok) estado = {reservadas:Number(j.reservadas)||0, ok:true};
   }catch(e){ /* se valida igual al enviar */ }
+  finally{ clearTimeout(to); }
   paintCupo();
 }
 const quedan = () => Math.max(0, (Number(C.cupo)||0) - estado.reservadas);
@@ -541,7 +548,7 @@ function paintTotals(){
     <div class="t"><span>Total</span><span class="num">${money(k.total)}</span></div>`;
   $("vCompleto").textContent = money(k.total); $("vAnticipo").textContent = money(k.anticipo);
   $("restoTxt").textContent = `El resto (${money(k.total-k.anticipo)}) lo pagas al retirar`;
-  document.querySelectorAll(".opt").forEach(o => o.setAttribute("aria-checked", String(o.dataset.pago===F.pago)));
+  document.querySelectorAll(".opt").forEach(o => { o.setAttribute("aria-checked", String(o.dataset.pago===F.pago)); o.tabIndex = o.dataset.pago===F.pago ? 0 : -1; });
   const m = $("bankMonto"); if(m) m.textContent = money(k.monto);
   const st = $("sendTxt"); if(st) st.textContent = `Enviar reserva · ${money(k.monto)}`;
 }
@@ -561,12 +568,23 @@ $("lines").addEventListener("click", e => {
   if(b.dataset.q){ const d = Number(b.dataset.q); if(d>0 && totalQ()>=maxQ()) return; l.q = Math.max(1, l.q + d); }
   else if(b.dataset.sin){ const n = b.dataset.sin, k = l.sin.indexOf(n); if(k>=0) l.sin.splice(k,1); else l.sin.push(n); }
   else if(b.hasAttribute("data-rm")) F.lines.splice(i,1);
+  // las líneas se redibujan: devolver el foco al mismo botón para quien usa teclado
+  const sel = b.dataset.q ? `[data-q="${b.dataset.q}"]` : b.dataset.sin ? `[data-sin="${CSS.escape(b.dataset.sin)}"]` : null;
   paintLines(); paintTotals();
+  const li = sel && $("lines").querySelector(`.lineitem[data-i="${i}"]`), nb = li && li.querySelector(sel);
+  if(nb && !nb.disabled) nb.focus({preventScroll:true});
 });
 $("addLine").addEventListener("click", () => { if(totalQ() >= maxQ()) return; F.lines.push({q:1, sin:[]}); paintLines(); paintTotals(); });
 $("colaMas").addEventListener("click", () => { if(F.colas<30){ F.colas++; paintTotals(); } });
 $("colaMenos").addEventListener("click", () => { if(F.colas>0){ F.colas--; paintTotals(); } });
 document.querySelectorAll(".opt").forEach(o => o.addEventListener("click", () => { F.pago = o.dataset.pago; paintTotals(); }));
+// radiogroup: flechas cambian la opción (patrón ARIA de radio)
+document.querySelector(".opts").addEventListener("keydown", e => {
+  if(!/^Arrow(Up|Down|Left|Right)$/.test(e.key)) return;
+  e.preventDefault();
+  const os = [...document.querySelectorAll(".opt")], k = os.findIndex(o => o.dataset.pago===F.pago), d = /Up|Left/.test(e.key) ? -1 : 1;
+  const n = os[(k + d + os.length) % os.length]; F.pago = n.dataset.pago; paintTotals(); n.focus();
+});
 
 /* copiar */
 let toastT;
@@ -593,7 +611,8 @@ function setProof(file){
   img.onload = () => {
     const s = Math.min(1, 1600 / Math.max(img.width, img.height));
     const cv = document.createElement("canvas"); cv.width = Math.round(img.width*s); cv.height = Math.round(img.height*s);
-    cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+    const cx = cv.getContext("2d"); cx.fillStyle = "#fff"; cx.fillRect(0, 0, cv.width, cv.height);   // un PNG con transparencia no sale negro en JPEG
+    cx.drawImage(img, 0, 0, cv.width, cv.height);
     F.proof = {nombre:file.name, tipo:"image/jpeg", base64:cv.toDataURL("image/jpeg", .82).split(",")[1]};
     $("proofImg").src = url; $("proofName").textContent = file.name;
     $("drop").hidden = true; $("proof").hidden = false; fieldErr("fProof", "");
@@ -619,7 +638,7 @@ function validate(){
   if(first){ scrollToEl(first); if(first.focus) first.focus({preventScroll:true}); }
   return !first;
 }
-function scrollToEl(el){ if(lenis) lenis.scrollTo(el, {offset:-140}); else el.scrollIntoView({behavior:"smooth", block:"center"}); }
+function scrollToEl(el){ if(lenis) lenis.scrollTo(el, {offset:-140}); else el.scrollIntoView({behavior:reduce ? "auto" : "smooth", block:"center"}); }
 $("form").addEventListener("submit", async e => {
   e.preventDefault();
   $("formErr").hidden = true;
@@ -704,7 +723,7 @@ function intro(){
     if(!hasGsap || reduce || seen){ ld.remove(); document.body.classList.remove("is-loading"); resolve(false); return; }
     try{ sessionStorage.setItem("trozo-intro","1"); }catch(e){}
     const o = {v:0};
-    const tl = gsap.timeline({onComplete:() => { ld.remove(); document.body.classList.remove("is-loading"); }});
+    const tl = gsap.timeline({onComplete:() => { ld.remove(); document.body.classList.remove("is-loading"); if(lenis) lenis.start(); }});
     tl.to(".loader__fire", {scale:1, duration:.7, ease:"back.out(2.2)"}, 0)
       .to(o, {v:220, duration:1.35, ease:"power2.inOut", onUpdate:() => { $("ldNum").textContent = Math.round(o.v); }}, .05)
       .to("#ldBar", {width:"100%", duration:1.35, ease:"power2.inOut"}, .05)
@@ -718,9 +737,10 @@ function motion(withIntro){
   gsap.registerPlugin(ScrollTrigger);
   if(window.Lenis){
     lenis = new Lenis({lerp:.11, smoothWheel:true});
+    if(document.body.classList.contains("is-loading")) lenis.stop();   // la intro todavía tapa la página
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add(t => lenis.raf(t*1000)); gsap.ticker.lagSmoothing(0);
-    document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener("click", e => { const t = document.querySelector(a.getAttribute("href")); if(t){ e.preventDefault(); lenis.scrollTo(t, {offset:a.getAttribute("href")==="#top" ? 0 : -10, duration:1.4}); } }));
+    document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener("click", e => { const t = document.querySelector(a.getAttribute("href")); if(t){ e.preventDefault(); lenis.scrollTo(t, {offset:a.getAttribute("href")==="#top" ? 0 : -(parseFloat(getComputedStyle(t).scrollMarginTop) || 10), duration:1.4}); } }));
   }
   // portada: letras que suben, burger que cae y nombre en serif
   const gch = splitChars($("giantTxt")), nch = splitChars($("nameTxt"));
