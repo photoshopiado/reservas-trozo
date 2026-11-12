@@ -1,0 +1,66 @@
+{
+  "_nota": "Este archivo define la apertura actual. Lo lee la página y también el código de Google para validar cupo, cierre y precios.",
+  "id": "2026-12-05",
+  "abierta": true,
+  "burger": {
+    "nombre": "Pickles Chunk",
+    "etiqueta": "Edición de diciembre",
+    "descripcion": "Carne al grill con cheddar derretido, tocino crocante y una buena carga de pepinillos encurtidos. Le metimos aros de cebolla morada, rúcula y nuestra mayo de la casa, todo en pan tipo Whopper artesanal. Ácida, ahumada y sin pedir perdón.",
+    "precio": 9.99,
+    "foto": "img/burger-1600.jpg",
+    "fotoChica": "img/burger-900.jpg",
+    "ingredientes": [
+      {
+        "nombre": "Pan tipo Whopper artesanal",
+        "quitar": false
+      },
+      {
+        "nombre": "Mayonesa de la casa",
+        "quitar": true
+      },
+      {
+        "nombre": "Tocino",
+        "quitar": true
+      },
+      {
+        "nombre": "Queso cheddar",
+        "quitar": true
+      },
+      {
+        "nombre": "Carne al grill",
+        "quitar": false
+      },
+      {
+        "nombre": "Pepinillos encurtidos",
+        "quitar": true
+      },
+      {
+        "nombre": "Aros de cebolla morada",
+        "quitar": true
+      },
+      {
+        "nombre": "Rúcula",
+        "quitar": true
+      }
+    ],
+    "recorte": "img/burger-cut.webp",
+    "recorteChico": "img/burger-cut-700.webp"
+  },
+  "fecha": "2026-12-05",
+  "hora": "17:30",
+  "cierre": "2026-12-04T20:00:00-05:00",
+  "cupo": 20,
+  "maxPorReserva": 10,
+  "cola": 1.0,
+  "pago": {
+    "banco": "Banco Pichincha",
+    "tipo": "Cuenta de ahorros",
+    "numero": "2203641834",
+    "titular": "Maria Cristina Roman Celleri",
+    "cedula": "0930164660"
+  },
+  "whatsapp": "593998948781",
+  "whatsappVisible": "099 894 8781",
+  "instagram": "trozo.ec",
+  "endpoint": ""
+}
