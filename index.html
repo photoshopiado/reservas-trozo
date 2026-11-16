@@ -173,15 +173,28 @@ em{font-family:var(--serif);font-style:italic;font-weight:400}
 .hint b{color:var(--ink);font-weight:700}
 .lineitem{border:1px solid var(--ink-line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;background:#fffdf7}
 .lineitem__top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.lineitem__name{font-weight:800;letter-spacing:-.02em;font-size:17px}
+.lineitem__name{font-weight:800;letter-spacing:-.02em;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lineitem__top{gap:8px}
+.lineitem .stepper button{width:42px;height:42px}
+.lineitem .stepper output{min-width:30px}
+.lineitem .x{width:36px;height:36px}
 .lineitem__name small{display:block;font-weight:500;font-size:13px;color:var(--ink-mute)}
 .x{width:40px;height:40px;border-radius:50%;color:var(--ink-mute);font-size:22px;display:grid;place-items:center;flex:none}
 .stepper{display:inline-flex;align-items:center;border:1.5px solid var(--ink);border-radius:99px;flex:none}
 .stepper button{width:46px;height:46px;border-radius:50%;font-size:22px;font-weight:500;display:grid;place-items:center}
 .stepper button:disabled{opacity:.22;cursor:default}
 .stepper output{min-width:34px;text-align:center;font-size:21px;font-weight:900}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{min-height:40px;padding:0 13px;border:1px solid rgba(10,10,10,.22);border-radius:99px;font-size:14px;font-weight:500;transition:background .25s,color .25s,border-color .25s}
+/* quitar ingredientes: un desplegable dentro de cada burger */
+.sin{border-top:1px solid var(--ink-line);margin:0 -14px -14px;padding:0 14px}
+.sin__toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:50px;padding:10px 0;text-align:left;font-size:15px;font-weight:600}
+.sin__toggle small{display:block;margin-top:2px;font-size:13px;font-weight:600;color:var(--flama)}
+.sin__chev{width:30px;height:30px;border-radius:50%;border:1px solid rgba(10,10,10,.2);display:grid;place-items:center;flex:none;transition:transform .35s var(--ease),background .25s}
+.sin__chev svg{width:14px;height:14px}
+.sin__toggle[aria-expanded="true"] .sin__chev{transform:rotate(180deg);background:var(--ink);color:var(--fg);border-color:var(--ink)}
+.sin__opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:2px 0 14px}
+.sin__opts .chip{width:100%;min-height:46px;padding:8px 12px;border-radius:12px;text-align:left;line-height:1.2}
+.sin__opts .chip:last-child:nth-child(odd){grid-column:1/-1}
 .chip[aria-pressed="true"]{background:var(--flama);border-color:var(--flama);color:var(--fg);font-weight:700;text-decoration:line-through;text-decoration-thickness:2px}
 .addline{align-self:flex-start;font-size:14px;font-weight:600;min-height:40px;display:inline-flex;align-items:center;text-decoration:underline;text-underline-offset:3px}
 .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -474,13 +487,19 @@ function paintLines(){
   $("lines").innerHTML = F.lines.map((l,i) => `
     <div class="lineitem" data-i="${i}">
       <div class="lineitem__top">
-        <div class="lineitem__name">${esc(C.burger.nombre)}${many ? `<small>${l.sin.length ? "Con cambios" : "Tal cual"}</small>` : ""}</div>
+        <div class="lineitem__name" title="${esc(C.burger.nombre)}">${esc(C.burger.nombre)}</div>
         <div style="display:flex;align-items:center;gap:6px">
           <div class="stepper"><button type="button" data-q="-1" aria-label="Una menos" ${l.q<=1 ? "disabled" : ""}>−</button><output class="num">${l.q}</output><button type="button" data-q="1" aria-label="Una más" ${full ? "disabled" : ""}>+</button></div>
           ${many ? `<button type="button" class="x" data-rm aria-label="Quitar esta línea">×</button>` : ""}
         </div>
       </div>
-      ${rm.length ? `<div><p class="hint" style="margin-bottom:8px">¿Le quitamos algo?</p><div class="chips">${rm.map(n => `<button type="button" class="chip" data-sin="${esc(n)}" aria-pressed="${l.sin.includes(n)}">${esc(n)}</button>`).join("")}</div></div>` : ""}
+      ${rm.length ? `<div class="sin">
+        <button type="button" class="sin__toggle" data-open aria-expanded="${!!l.open}" aria-controls="sin${i}">
+          <span>¿Le quitamos algo?${l.sin.length ? `<small>Sin ${esc(l.sin.map(x => x.toLowerCase()).join(", "))}</small>` : ""}</span>
+          <span class="sin__chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </button>
+        <div class="sin__opts" id="sin${i}" ${l.open ? "" : "hidden"}>${rm.map(n => `<button type="button" class="chip" data-sin="${esc(n)}" aria-pressed="${l.sin.includes(n)}">${esc(n)}</button>`).join("")}</div>
+      </div>` : ""}
     </div>`).join("");
   $("addLine").hidden = full || !rm.length;
 }
@@ -513,13 +532,14 @@ $("lines").addEventListener("click", e => {
   if(b.dataset.q){ const d = Number(b.dataset.q); if(d>0 && totalQ()>=maxQ()) return; l.q = Math.max(1, l.q + d); }
   else if(b.dataset.sin){ const n = b.dataset.sin, k = l.sin.indexOf(n); if(k>=0) l.sin.splice(k,1); else l.sin.push(n); }
   else if(b.hasAttribute("data-rm")) F.lines.splice(i,1);
+  else if(b.hasAttribute("data-open")) l.open = !l.open;
   // las líneas se redibujan: devolver el foco al mismo botón para quien usa teclado
-  const sel = b.dataset.q ? `[data-q="${b.dataset.q}"]` : b.dataset.sin ? `[data-sin="${CSS.escape(b.dataset.sin)}"]` : null;
+  const sel = b.dataset.q ? `[data-q="${b.dataset.q}"]` : b.dataset.sin ? `[data-sin="${CSS.escape(b.dataset.sin)}"]` : b.hasAttribute("data-open") ? "[data-open]" : null;
   paintLines(); paintTotals();
   const li = sel && $("lines").querySelector(`.lineitem[data-i="${i}"]`), nb = li && li.querySelector(sel);
   if(nb && !nb.disabled) nb.focus({preventScroll:true});
 });
-$("addLine").addEventListener("click", () => { if(totalQ() >= maxQ()) return; F.lines.push({q:1, sin:[]}); paintLines(); paintTotals(); });
+$("addLine").addEventListener("click", () => { if(totalQ() >= maxQ()) return; F.lines.push({q:1, sin:[], open:true}); paintLines(); paintTotals(); });
 $("colaMas").addEventListener("click", () => { if(F.colas<30){ F.colas++; paintTotals(); } });
 $("colaMenos").addEventListener("click", () => { if(F.colas>0){ F.colas--; paintTotals(); } });
 
