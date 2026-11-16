@@ -124,12 +124,6 @@ em{font-family:var(--serif);font-style:italic;font-weight:400}
   .hero__go{min-height:50px;font-size:16px}
 }
 
-/* ---------- franja ---------- */
-.band-clip{position:relative;z-index:4;overflow:hidden;padding:clamp(24px,3vw,44px) 0;margin:clamp(-44px,-3vw,-24px) 0}
-.band{position:relative;background:var(--flama);color:var(--fg);padding:clamp(14px,1.8vw,22px) 0;transform:rotate(-2deg) scale(1.06);overflow:hidden;box-shadow:0 20px 40px -20px rgba(0,0,0,.8)}
-.band__in{display:flex;width:max-content;align-items:center;will-change:transform}
-.band__in span{display:inline-flex;align-items:center;gap:clamp(14px,2vw,28px);padding-right:clamp(14px,2vw,28px);font-weight:900;text-transform:uppercase;letter-spacing:-.03em;font-size:clamp(24px,3.6vw,52px);white-space:nowrap}
-.band__in img{width:clamp(16px,2vw,26px);height:auto;filter:brightness(0) invert(.94) sepia(.15)}
 
 
 .recipe{padding:clamp(56px,8vw,110px) var(--pad) clamp(64px,8vw,120px)}
@@ -154,8 +148,7 @@ em{font-family:var(--serif);font-style:italic;font-weight:400}
 .reserve__grid{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(28px,4vw,64px);max-width:1320px;margin:0 auto}
 .reserve__head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:18px 40px}
 .reserve__title{font-size:clamp(58px,10.6vw,178px);font-weight:900;text-transform:uppercase;letter-spacing:-.07em;line-height:.82}
-.reserve__title em{text-transform:none;letter-spacing:-.03em;color:var(--flama)}
-.reserve__lead{font-size:clamp(16px,1.4vw,19px);max-width:34ch;color:#33322e}
+.reserve__title em{text-transform:none;letter-spacing:-.03em;color:var(--flama);white-space:nowrap}
 .reserve__aside{display:flex;flex-direction:column;gap:14px}
 .reserve__pic{position:relative;border-radius:22px;overflow:hidden;background:#111;aspect-ratio:4/5}
 .reserve__pic img{width:100%;height:100%;object-fit:cover;object-position:50% 80%}
@@ -302,7 +295,7 @@ textarea.input{padding:12px 16px;min-height:84px;resize:vertical;line-height:1.4
     <canvas class="embers" id="embers" aria-hidden="true"></canvas>
     <div class="stage" aria-hidden="true">
       <div class="giant" id="giant"><span class="line"><span id="giantTxt">Trozo</span></span></div>
-      <div class="burger" id="burger"><img id="burgerImg" src="img/burger-cut-700.webp" srcset="img/burger-cut-700.webp 700w, img/burger-cut.webp 1200w" sizes="(min-width:1000px) 980px, 92vw" alt="" width="1200" height="987"></div>
+      <div class="burger" id="burger"><div id="burgerIn"><img id="burgerImg" src="img/burger-cut-700.webp" srcset="img/burger-cut-700.webp 700w, img/burger-cut.webp 1200w" sizes="(min-width:1000px) 980px, 92vw" alt="" width="1200" height="987"></div></div>
     </div>
     <h1 class="hero__name" id="heroName"><span class="sr" id="nameFirst"></span><span class="line"><span id="nameTxt">La burger del mes</span></span></h1>
     <dl class="facts">
@@ -313,8 +306,6 @@ textarea.input{padding:12px 16px;min-height:84px;resize:vertical;line-height:1.4
     <div class="hero__cta"><div class="price num" id="price"></div><a class="pill pill--fire hero__go" href="#reservar" data-magnet>Reservar la mía <b aria-hidden="true">↓</b></a></div>
   </section>
 
-  <div class="band-clip" aria-hidden="true"><div class="band"><div class="band__in" id="band"></div></div></div>
-
   <section class="recipe" aria-labelledby="recipeT">
     <div class="recipe__top"><h2 class="recipe__title" id="recipeT">Lo que <em>lleva</em></h2></div>
     <ul class="ing" id="ing"></ul>
@@ -324,7 +315,6 @@ textarea.input{padding:12px 16px;min-height:84px;resize:vertical;line-height:1.4
     <div class="reserve__grid">
       <header class="reserve__head">
         <h2 class="reserve__title" id="resT">Reserva <em>la tuya</em></h2>
-        <p class="reserve__lead">Transfieres, subes la captura y listo. Te escribimos por WhatsApp para coordinar el retiro.</p>
       </header>
       <div class="reserve__aside">
         <div class="reserve__pic"><img id="resPic" src="img/burger-900.jpg" alt="" loading="lazy" width="900" height="1350">
@@ -445,10 +435,6 @@ function paintBurger(){
   $("tagName").textContent = b.nombre;
   $("tagWhen").textContent = `${cap(DIAS[d.getDay()])} ${d.getDate()} de ${MESES[d.getMonth()]} · ${C.hora}`;
   $("tagPrice").textContent = money(cents(b.precio));
-  // franja
-  const items = [b.etiqueta || "La burger del mes", "Bajo reserva", `${cap(DIAS3[d.getDay()].toLowerCase())} ${d.getDate()} ${MES3[d.getMonth()]}`, `Solo ${C.cupo}`, "Retiras tú o mandas tu delivery", b.nombre];
-  const chunk = items.map(t => `<span>${esc(t)} <img src="img/llama.svg" alt=""></span>`).join("");
-  $("band").innerHTML = chunk + chunk + chunk + chunk;
   // ingredientes
   $("ing").innerHTML = (b.ingredientes||[]).map(i => `<li><h3>${esc(i.nombre)}</h3></li>`).join("");
   $("colaPrecio").textContent = money(cents(C.cola)) + " c/u";
@@ -696,22 +682,19 @@ function motion(withIntro){
   // portada: letras que suben, burger que cae y nombre en serif
   const gch = splitChars($("giantTxt")), nch = splitChars($("nameTxt"));
   gsap.set(gch, {yPercent:115, rotate:6}); gsap.set(nch, {yPercent:115});
-  gsap.set("#burger", {y:-90, scale:.82, rotate:-8, opacity:0});
+  gsap.set("#burgerIn", {y:-90, scale:.82, rotate:-8, opacity:0});
   const d = withIntro ? .1 : .2;
   gsap.timeline({delay:d})
     .to(gch, {yPercent:0, rotate:0, duration:1.25, ease:"expo.out", stagger:.045})
-    .to("#burger", {y:0, scale:1, rotate:-3, opacity:1, duration:1.2, ease:"back.out(1.5)"}, .15)
+    .to("#burgerIn", {y:0, scale:1, rotate:-3, opacity:1, duration:1.2, ease:"back.out(1.5)"}, .15)
     .to(nch, {yPercent:0, duration:1, ease:"expo.out", stagger:.03}, .35)
     .from(".fact, .price, .hero__go", {opacity:0, y:16, duration:.8, ease:"power3.out", stagger:.06}, .5);
-  // scroll de la portada: el nombre sube, la burger gira y se acerca
-  gsap.to("#giant", {yPercent:-22, ease:"none", scrollTrigger:{trigger:".hero", start:"top top", end:"bottom top", scrub:true}});
-  gsap.to("#burger", {y:120, rotate:6, scale:1.08, ease:"none", scrollTrigger:{trigger:".hero", start:"top top", end:"bottom top", scrub:true}});
+  // scroll de la portada: un paralaje suave que vuelve exacto a su lugar al subir
+  const scrub = {trigger:".hero", start:"top top", end:"bottom top", scrub:true};
+  gsap.fromTo("#giant", {yPercent:0}, {yPercent:-12, ease:"none", scrollTrigger:scrub});
+  gsap.fromTo("#burger", {y:0, rotate:0, scale:1}, {y:50, rotate:3, scale:1.03, ease:"none", scrollTrigger:{...scrub}});
   // la burger flota un poquito
   gsap.to("#burgerImg", {y:-10, duration:2.4, ease:"sine.inOut", yoyo:true, repeat:-1});
-  // franja que corre (y se acelera con el scroll)
-  const band = $("band"); let bx = 0, boost = 0;
-  ScrollTrigger.create({onUpdate:s => { boost = Math.min(6, Math.abs(s.getVelocity())/400); }});
-  gsap.ticker.add(() => { bx -= 1.1 + boost; boost *= .92; const w = band.scrollWidth/4; if(-bx >= w) bx += w; band.style.transform = `translate3d(${bx}px,0,0)`; });
   // títulos y filas
   gsap.utils.toArray(".recipe__title, .reserve__title").forEach(el => gsap.from(el, {yPercent:40, opacity:0, duration:1.2, ease:"expo.out", scrollTrigger:{trigger:el, start:"top 88%"}}));
   // botones magnéticos en computadora
